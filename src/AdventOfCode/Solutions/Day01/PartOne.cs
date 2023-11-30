@@ -2,8 +2,9 @@
 
 public class PartOne : ISolution
 {
-    public Task RunAsync()
+    public async Task RunAsync(FileInfo input)
     {
-        throw new NotImplementedException();
+        var text = await File.ReadAllTextAsync(input.FullName);
+        Console.WriteLine(text);
     }
 }

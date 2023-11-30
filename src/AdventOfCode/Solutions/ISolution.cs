@@ -2,5 +2,5 @@
 
 public interface ISolution
 {
-    Task RunAsync();
+    Task RunAsync(FileInfo input);
 }
