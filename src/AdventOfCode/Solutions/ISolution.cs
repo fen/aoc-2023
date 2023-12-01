@@ -2,5 +2,7 @@
 
 public interface ISolution
 {
-    Task RunAsync(FileInfo input);
+    public int Day { get; }
+    public int Part { get; }
+    Task<string> RunAsync(FileInfo input);
 }
