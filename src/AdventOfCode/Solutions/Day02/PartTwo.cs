@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode.Solutions.Day02;
+namespace AdventOfCode.Solutions.Day02;
 
 public class PartTwo : ISolution {
     public int Day => 2;
@@ -49,7 +49,7 @@ file class Game(int gameId, List<List<Cube>> subSets) {
 
     public static Game Parse(string line) {
         var (rawGameId, rawSets) = line.Split(':');
-        int gameId = int.Parse(rawGameId.Split(' ')[1]);
+        var gameId = int.Parse(rawGameId.Split(' ')[1]);
         var rawSubSets = rawSets.Trim().Split(';');
 
         List<List<Cube>> subSets = [];
