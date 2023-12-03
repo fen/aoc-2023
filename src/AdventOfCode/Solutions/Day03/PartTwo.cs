@@ -1,6 +1,7 @@
 namespace AdventOfCode.Solutions.Day03;
 
-public class PartTwo : ISolution {
+public class PartTwo : ISolution
+{
     public int Day => 3;
     public int Part => 2;
 
@@ -15,11 +16,13 @@ public class PartTwo : ISolution {
                 products.Add(numbers[0].Value * numbers[1].Value);
             }
         }
+
         return products.Sum().ToString();
     }
 }
 
-file class Grid {
+file class Grid
+{
     private readonly List<Number> _numbers = new();
     private readonly List<Symbol> _symbols = new();
 
@@ -60,7 +63,8 @@ file class Grid {
     }
 }
 
-file struct Number(int row, int column, int length, int value) {
+file struct Number(int row, int column, int length, int value)
+{
     public int Row => row;
     public int Column => column;
     public int Length => length;
@@ -93,6 +97,7 @@ file struct Number(int row, int column, int length, int value) {
             if (symbol.Row == number.Row + y && symbol.Column == number.Column + x) {
                 return true;
             }
+
             return false;
         }
     }
@@ -109,7 +114,8 @@ file struct Number(int row, int column, int length, int value) {
     }
 }
 
-file struct Symbol(int row, int column, char symbol) {
+file struct Symbol(int row, int column, char symbol)
+{
     public int Row => row;
     public int Column => column;
     public char Character => symbol;

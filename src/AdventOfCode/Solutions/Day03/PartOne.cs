@@ -1,8 +1,9 @@
 namespace AdventOfCode.Solutions.Day03;
 
-using Coordinate  = (int x, int y);
+using Coordinate = (int x, int y);
 
-public class PartOne : ISolution {
+public class PartOne : ISolution
+{
     public int Day => 3;
     public int Part => 1;
 
@@ -13,7 +14,8 @@ public class PartOne : ISolution {
     }
 }
 
-file class Grid {
+file class Grid
+{
     private readonly List<Number> _numbers = new();
     private readonly List<Symbol> _symbols = new();
 
@@ -49,7 +51,8 @@ file class Grid {
     }
 }
 
-file struct Number(int row, int column, int length, int value) {
+file struct Number(int row, int column, int length, int value)
+{
     public int Row => row;
     public int Column => column;
     public int Length => length;
@@ -67,7 +70,8 @@ file struct Number(int row, int column, int length, int value) {
     }
 }
 
-file struct Symbol(int row, int column) {
+file struct Symbol(int row, int column)
+{
     public int Row => row;
     public int Column => column;
 
@@ -97,6 +101,7 @@ file struct Symbol(int row, int column) {
                     return true;
                 }
             }
+
             return false;
         }
     }

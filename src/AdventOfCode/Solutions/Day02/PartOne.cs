@@ -1,6 +1,7 @@
 ﻿namespace AdventOfCode.Solutions.Day02;
 
-public class PartOne : ISolution {
+public class PartOne : ISolution
+{
     public int Day => 2;
     public int Part => 1;
 
@@ -15,11 +16,11 @@ public class PartOne : ISolution {
             foreach (var gameSubSet in game.SubSets) {
                 foreach (var (count, color) in gameSubSet) {
                     switch (color) {
-                        case Color.Red when count > 12:
-                        case Color.Green when count > 13:
-                        case Color.Blue when count > 14:
-                            possible = false;
-                            break;
+                    case Color.Red when count > 12:
+                    case Color.Green when count > 13:
+                    case Color.Blue when count > 14:
+                        possible = false;
+                        break;
                     }
                 }
 
@@ -35,7 +36,8 @@ public class PartOne : ISolution {
     }
 }
 
-file class Game(int gameId, List<List<Cube>> subSets) {
+file class Game(int gameId, List<List<Cube>> subSets)
+{
     public int GameId => gameId;
     public List<List<Cube>> SubSets => subSets;
 
@@ -62,6 +64,7 @@ file class Game(int gameId, List<List<Cube>> subSets) {
 
 file record Cube(int Count, Color Color);
 
-file enum Color {
+file enum Color
+{
     Red, Green, Blue
 }

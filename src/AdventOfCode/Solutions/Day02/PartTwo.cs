@@ -1,6 +1,7 @@
 namespace AdventOfCode.Solutions.Day02;
 
-public class PartTwo : ISolution {
+public class PartTwo : ISolution
+{
     public int Day => 2;
     public int Part => 2;
 
@@ -25,25 +26,27 @@ public class PartTwo : ISolution {
     }
 }
 
-file struct PowerCounter(int red, int green, int blue) {
+file struct PowerCounter(int red, int green, int blue)
+{
     public int Power => red * green * blue;
 
     public void Set(Color color, int value) {
         switch (color) {
-            case Color.Blue:
-                blue = Math.Max(blue, value);
-                break;
-            case Color.Green:
-                green = Math.Max(green, value);
-                break;
-            case Color.Red:
-                red = Math.Max(red, value);
-                break;
+        case Color.Blue:
+            blue = Math.Max(blue, value);
+            break;
+        case Color.Green:
+            green = Math.Max(green, value);
+            break;
+        case Color.Red:
+            red = Math.Max(red, value);
+            break;
         }
     }
 }
 
-file class Game(int gameId, List<List<Cube>> subSets) {
+file class Game(int gameId, List<List<Cube>> subSets)
+{
     public int GameId => gameId;
     public List<List<Cube>> SubSets => subSets;
 
@@ -70,6 +73,7 @@ file class Game(int gameId, List<List<Cube>> subSets) {
 
 file record Cube(int Count, Color Color);
 
-file enum Color {
+file enum Color
+{
     Red, Green, Blue
 }
