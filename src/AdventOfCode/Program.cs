@@ -15,6 +15,11 @@ using AdventOfCode.Solutions;
     await SolveAsync<AdventOfCode.Solutions.Day03.PartTwo>(GetInputFile(3));
 }
 
+{
+    await SolveAsync<AdventOfCode.Solutions.Day04.PartOne>(GetInputFile(4));
+    await SolveAsync<AdventOfCode.Solutions.Day04.PartTwo>(GetInputFile(4));
+}
+
 FileInfo GetInputFile(int day) => new($"Inputs/day_{day:D2}.input");
 
 async Task SolveAsync<T>(FileInfo input) where T : ISolution, new() {
