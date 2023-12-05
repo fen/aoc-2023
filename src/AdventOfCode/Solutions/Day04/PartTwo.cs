@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace AdventOfCode.Solutions.Day04;
 
 public class PartTwo : ISolution
@@ -25,12 +23,7 @@ public class PartTwo : ISolution
             }
         }
 
-        long result = 0;
-        foreach (var card in cards) {
-            result += card.Copies;
-        }
-
-        return result.ToString();
+        return cards.Select(c => c.Copies).Sum().ToString();
     }
 }
 
