@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode.Solutions.Day05;
+namespace AdventOfCode.Solutions.Day05;
 
 using static Helper;
 
@@ -10,6 +10,9 @@ public class PartTwo : ISolution
     public async Task<string> RunAsync(FileInfo input) {
         var lines = await File.ReadAllLinesAsync(input.FullName);
         var (seedRanges, maps) = Parse(lines);
+
+        // REVISIT: This is not an optimal way of solving this will try to get
+        // some time and revisit it and solve it with ranges instead.
 
         long min = long.MaxValue;
         foreach (var (start, length) in seedRanges) {
