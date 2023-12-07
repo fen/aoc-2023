@@ -3,24 +3,8 @@ using System.Text;
 
 namespace AdventOfCode;
 
-static class Helpers
+static partial class Helpers
 {
-    public static int Product(this IEnumerable<int> source) => Product<int, int>(source);
-    public static long Product(this IEnumerable<long> source) => Product<long, long>(source);
-
-    public static TResult Product<TSource, TResult>(this IEnumerable<TSource> source)
-        where TSource : struct, INumber<TSource>
-        where TResult : struct, INumber<TResult>
-    {
-        TResult sum = TResult.One;
-        foreach (TSource value in source)
-        {
-            checked { sum *= TResult.CreateChecked(value); }
-        }
-
-        return sum;
-    }
-
     public static void Deconstruct<T>(this T[] seq, out T first, out T second) {
         first = seq[0];
         second = seq.Length == 1 ? default! : seq[1];
@@ -31,12 +15,15 @@ static class Helpers
         second = seq.Length == 1 ? default! : seq[1];
         third = seq.Length == 2 ? default! : seq[2];
     }
+}
 
+static partial class Helpers
+{
     public static (T first, T last) FirstAndLast<T>(this IEnumerable<T> items) {
         using var enumerator = items.GetEnumerator();
         enumerator.MoveNext();
         var first = enumerator.Current;
-        T last = default;
+        T last = first;
         while (enumerator.MoveNext()) {
             last = enumerator.Current;
         }
@@ -56,14 +43,40 @@ static class Helpers
     public static IEnumerable<(T First, T Second)> ByTwo<T>(this IEnumerable<T> seq) {
         using var enumerator = seq.GetEnumerator();
         do {
-            if (!enumerator.MoveNext()) yield break;
+            if (!enumerator.MoveNext()) {
+                yield break;
+            }
+
             var first = enumerator.Current;
             enumerator.MoveNext();
             var second = enumerator.Current;
             yield return (first, second);
         } while (true);
     }
+}
 
+static partial class Helpers
+{
+    public static int Product(this IEnumerable<int> source) => Product<int, int>(source);
+
+    public static long Product(this IEnumerable<long> source) => Product<long, long>(source);
+
+    static TResult Product<TSource, TResult>(this IEnumerable<TSource> source)
+        where TSource : struct, INumber<TSource>
+        where TResult : struct, INumber<TResult>
+    {
+        TResult sum = TResult.One;
+        foreach (TSource value in source)
+        {
+            checked { sum *= TResult.CreateChecked(value); }
+        }
+
+        return sum;
+    }
+}
+
+static partial class Helpers
+{
     public static string ToReadableString(this TimeSpan timeSpan) {
         var stringBuilder = new StringBuilder();
 
@@ -103,13 +116,13 @@ static class Helpers
             .ReplaceLastOccurrence(", ", " and ");
     }
 
-    public static string TrimEnd(this string source, string value) {
+    static string TrimEnd(this string source, string value) {
         return source.EndsWith(value)
             ? source.Remove(source.LastIndexOf(value, StringComparison.Ordinal))
             : source;
     }
 
-    internal static string ReplaceLastOccurrence(this string source, string find, string replace) {
+    static string ReplaceLastOccurrence(this string source, string find, string replace) {
         var index = source.LastIndexOf(find, StringComparison.Ordinal);
 
         if (index == -1) {
