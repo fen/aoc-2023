@@ -19,6 +19,15 @@ static partial class Helpers
 
 static partial class Helpers
 {
+    public static string[] TrimSplit(this string self, char separator) {
+        var splits = self.Split(separator);
+        for (var i = 0; i < splits.Length; i++) {
+            splits[i] = splits[i].Trim();
+        }
+
+        return splits;
+    }
+
     public static (T first, T last) FirstAndLast<T>(this IEnumerable<T> items) {
         using var enumerator = items.GetEnumerator();
         enumerator.MoveNext();

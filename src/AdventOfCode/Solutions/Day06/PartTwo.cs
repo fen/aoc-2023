@@ -13,14 +13,20 @@ class PartTwo : ISolution
         var time = long.Parse(rawTimes.Trim().Replace(" ", ""));
         var distance = long.Parse(rawDistances.Trim().Replace(" ", ""));
 
-        int win = 0;
-        for (var i = 0; i <= time; i++) {
-            var totalDistanceTraveled = (time - i) * i;
-            if (totalDistanceTraveled > distance) {
-                win += 1;
-            }
-        }
+        // int win = 0;
+        // for (var i = 0; i <= time; i++) {
+        //     var totalDistanceTraveled = (time - i) * i;
+        //     if (totalDistanceTraveled > distance) {
+        //         win += 1;
+        //     }
+        // }
 
-        return win.ToString();
+        return CalculateWinningScenarios(time, distance).ToString();
+    }
+
+    public int CalculateWinningScenarios(long time, long distance) {
+        double discriminant = Math.Sqrt(time * time - 4.0 * distance);
+        double t0 = (time - discriminant) / 2.0;
+        return (int)Math.Ceiling(time - 2 * t0);
     }
 }
