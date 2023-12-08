@@ -1,8 +1,8 @@
-﻿namespace AdventOfCode.Solutions.Day08;
+namespace AdventOfCode.Solutions.Day08;
 
 public class PartOne : ISolution
 {
-    public int Day => 7;
+    public int Day => 8;
     public int Part => 1;
 
     public async Task<string> RunAsync(FileInfo input) {
