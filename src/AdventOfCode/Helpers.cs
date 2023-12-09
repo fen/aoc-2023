@@ -19,7 +19,13 @@ static partial class Helpers
 
 static partial class Helpers
 {
-    public static string[] TrimSplit(this string self, char separator) {
+    /// <summary>
+    /// Splits the given string by the specified separator character and trims each element.
+    /// </summary>
+    /// <param name="self">The input string to be split and trimmed.</param>
+    /// <param name="separator">The separator character used to split the string.</param>
+    /// <returns>An array of strings, where each element is a trimmed substring from the original input string.</returns>
+    public static string[] SplitAndTrimEach(this string self, char separator) {
         var splits = self.Split(separator);
         for (var i = 0; i < splits.Length; i++) {
             splits[i] = splits[i].Trim();
@@ -28,6 +34,12 @@ static partial class Helpers
         return splits;
     }
 
+    /// <summary>
+    /// Returns the first and last elements of the given sequence.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the sequence.</typeparam>
+    /// <param name="items">The sequence of elements.</param>
+    /// <returns>A tuple consisting of the first and last elements of the sequence.</returns>
     public static (T first, T last) FirstAndLast<T>(this IEnumerable<T> items) {
         using var enumerator = items.GetEnumerator();
         enumerator.MoveNext();
@@ -39,7 +51,13 @@ static partial class Helpers
         return (first, last);
     }
 
-    public static IEnumerable<(T, int)> Iter<T>(this IEnumerable<T> items) {
+    /// <summary>
+    /// Enumerates over the given collection while also providing the index of each item.
+    /// </summary>
+    /// <typeparam name="T">The type of the items in the collection.</typeparam>
+    /// <param name="items">The collection to enumerate.</param>
+    /// <returns>An enumerable of tuples containing each item in the collection along with its index.</returns>
+    public static IEnumerable<(T, int)> EnumerateWithIndex<T>(this IEnumerable<T> items) {
         using var enumerator = items.GetEnumerator();
         for (int i = 0; enumerator.MoveNext(); i++) {
             yield return (enumerator.Current, i);
@@ -47,9 +65,19 @@ static partial class Helpers
     }
 
     /// <summary>
-    /// Group IEnumerable sequence in a enumerable tuple of three items.
+    /// Returns an enumerable sequence of tuples where each tuple contains two consecutive elements from the input sequence.
     /// </summary>
-    public static IEnumerable<(T First, T Second)> ByTwo<T>(this IEnumerable<T> seq) {
+    /// <typeparam name="T">The type of elements in the sequence.</typeparam>
+    /// <param name="seq">The input sequence.</param>
+    /// <returns>An enumerable sequence of tuples where each tuple contains two consecutive elements from the input sequence.</returns>
+    /// <remarks>
+    /// The method returns tuples of the form <c>(T First, T Second)</c> where <c>First</c> corresponds to the first element
+    /// and <c>Second</c> corresponds to the second element.
+    /// The method internally uses an enumerator to iterate through the input sequence, retrieving two consecutive elements
+    /// at a time until there are no more elements left. If the input sequence is empty or has an odd number of elements,
+    /// no tuple will be returned.
+    /// </remarks>
+    public static IEnumerable<(T first, T second)> ByTwo<T>(this IEnumerable<T> seq) {
         using var enumerator = seq.GetEnumerator();
         do {
             if (!enumerator.MoveNext()) {
@@ -62,12 +90,45 @@ static partial class Helpers
             yield return (first, second);
         } while (true);
     }
+
+    /// <summary>
+    /// Generates adjacent pairs of elements from a given sequence.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the sequence.</typeparam>
+    /// <param name="seq">The sequence of elements.</param>
+    /// <returns>An enumerable of tuples representing adjacent pairs of elements.</returns>
+    public static IEnumerable<(T first, T second)> AdjacentPairs<T>(this IEnumerable<T> seq)
+    {
+        using var enumerator = seq.GetEnumerator();
+        enumerator.MoveNext();
+        var first = enumerator.Current;
+        do {
+            if (!enumerator.MoveNext()) {
+                yield break;
+            }
+
+            var second = enumerator.Current;
+            yield return (first, second);
+            first = second;
+
+        } while (true);
+    }
 }
 
 static partial class Helpers
 {
+    /// <summary>
+    /// Calculates the product of all elements in the given sequence.
+    /// </summary>
+    /// <param name="source">The sequence of elements</param>
+    /// <returns>The product of all elements in the sequence</returns>
     public static int Product(this IEnumerable<int> source) => Product<int, int>(source);
 
+    /// <summary>
+    /// Calculates the product of all elements in the specified sequence.
+    /// </summary>
+    /// <param name="source">The sequence to calculate the product for.</param>
+    /// <returns>The product of all elements in the sequence.</returns>
     public static long Product(this IEnumerable<long> source) => Product<long, long>(source);
 
     static TResult Product<TSource, TResult>(this IEnumerable<TSource> source)
@@ -86,6 +147,11 @@ static partial class Helpers
 
 static partial class Helpers
 {
+    /// <summary>
+    /// Converts a TimeSpan object to a human-readable string representation.
+    /// </summary>
+    /// <param name="timeSpan">The TimeSpan object to convert.</param>
+    /// <returns>A string representation of the TimeSpan object in days, hours, minutes, seconds, and milliseconds.</returns>
     public static string ToReadableString(this TimeSpan timeSpan) {
         var stringBuilder = new StringBuilder();
 

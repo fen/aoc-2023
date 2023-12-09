@@ -44,7 +44,7 @@ file class Grid
 
     public static Grid Parse(string[] lines) {
         var grid = new Grid();
-        foreach (var (line, row) in lines.Iter()) {
+        foreach (var (line, row) in lines.EnumerateWithIndex()) {
             for (var column = 0; column < line.Length; column++) {
                 if (char.IsNumber(line[column])) {
                     var number = Number.Parse(row, ref column, line);

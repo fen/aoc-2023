@@ -77,10 +77,10 @@ file class Node(string id, string left, string right)
                         throw new InvalidOperationException("Method Populate needs to be called before accessing Right");
 
     public static Node Parse(string line) {
-        var (rawId, rawNavigation) = line.TrimSplit('=');
+        var (rawId, rawNavigation) = line.SplitAndTrimEach('=');
         var id = rawId.Trim();
         var navigation = rawNavigation.TrimStart('(').TrimEnd(')');
-        var (left, right) = navigation.TrimSplit(',');
+        var (left, right) = navigation.SplitAndTrimEach(',');
         return new Node(id, left, right);
     }
 
