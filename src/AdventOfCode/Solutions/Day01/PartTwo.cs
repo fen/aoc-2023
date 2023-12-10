@@ -7,8 +7,8 @@ public class PartTwo : ISolution
     public int Day => 1;
     public int Part => 2;
 
-    public async Task<string> RunAsync(FileInfo input) {
-        var lines = await File.ReadAllLinesAsync(input.FullName);
+    public async Task<string> RunAsync(FileInfo file) {
+        var lines = await File.ReadAllLinesAsync(file.FullName);
 
         return lines.Select(static line => {
             GetNumbers(line);

@@ -6,8 +6,8 @@ class PartTwo : ISolution
 
     public int Part => 2;
 
-    public async Task<string> RunAsync(FileInfo input) {
-        var lines = await File.ReadAllLinesAsync(input.FullName);
+    public async Task<string> RunAsync(FileInfo file) {
+        var lines = await File.ReadAllLinesAsync(file.FullName);
 
         var hands = lines.Select(Hand.Parse).ToArray();
 

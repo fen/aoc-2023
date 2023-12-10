@@ -5,8 +5,8 @@ public class PartTwo : ISolution
     public int Day => 2;
     public int Part => 2;
 
-    public async Task<string> RunAsync(FileInfo input) {
-        string[] lines = await File.ReadAllLinesAsync(input.FullName);
+    public async Task<string> RunAsync(FileInfo file) {
+        string[] lines = await File.ReadAllLinesAsync(file.FullName);
 
         var games = lines.Select(Game.Parse).ToArray();
         List<int> power = [];

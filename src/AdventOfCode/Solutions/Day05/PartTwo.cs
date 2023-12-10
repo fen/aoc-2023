@@ -7,88 +7,24 @@ public class PartTwo : ISolution
     public int Day => 5;
     public int Part => 2;
 
-    public async Task<string> RunAsync(FileInfo input) {
-        var lines = await File.ReadAllLinesAsync(input.FullName);
-        var (seedRanges, maps) = Parse(lines);
+    public async Task<string> RunAsync(FileInfo file) {
+        var input = (await File.ReadAllLinesAsync(file.FullName)).ToList();
 
-        // REVISIT: This is not an optimal way of solving this will try to get
-        // some time and revisit it and solve it with ranges instead.
-
-        long min = long.MaxValue;
-        foreach (var (start, length) in seedRanges) {
-            for (long i = start; i <= start + length; i++) {
-                var seed = i;
-                foreach (var m in maps) {
-                    seed = m.Convert(seed);
-                }
-
-                min = Math.Min(min, seed);
-            }
-        }
-
-        return min.ToString();
-    }
-}
-
-file class Map(string from, string to, Range[] ranges)
-{
-    public string From => from;
-    public string To => to;
-    public Range[] Ranges => ranges;
-
-    public long Convert(long source) {
-        foreach (var range in ranges) {
-            if (range.TryConvert(source, out var destination)) {
-                return destination;
-            }
-        }
-
-        return source;
-    }
-}
-
-file struct Range(long destinationStart, long sourceStart, long length)
-{
-    public long DestinationStart => destinationStart;
-    public long SourceStart => sourceStart;
-    public long Length => length;
-
-    public bool TryConvert(long source, out long destination) {
-        if (sourceStart <= source && source < sourceStart + length) {
-            destination = destinationStart + source - sourceStart;
-            return true;
-        }
-
-        destination = 0;
-        return false;
-    }
-}
-
-file class Helper
-{
-    public static ((long, long)[], List<Map>) Parse(string[] lines) {
-        (long, long)[] seedRanges = [];
+        long[] seeds;
         {
-            var (_, rawSeeds) = lines[0].Split(':');
-            seedRanges = rawSeeds.Trim()
-                .Split(' ')
-                .Where(n => n != "")
-                .Select(long.Parse)
-                .ByTwo()
-                .ToArray();
+            var (_, rawSeeds) = input[0].Split(':');
+            seeds = rawSeeds.Trim().Split(' ').Where(n => n != "").Select(long.Parse).ToArray();
         }
 
-        List<Map> maps = [];
+        List<List<IntervalMap>> maps = [];
 
         int line = 2;
-        while (line < lines.Length) {
-            var (rawMapName, _) = lines[line].Split(' ');
-            var (from, to) = rawMapName.Split('-').FirstAndLast();
+        while (line < input.Count) {
             line += 1;
 
-            List<Range> ranges = [];
-            while (line < lines.Length && lines[line].Length != 0) {
-                var (rawDestinationRange, rawSourceRange, rawRangeLength) = lines[line].Split(' ');
+            List<IntervalMap> ranges = [];
+            while (line < input.Count && input[line].Length != 0) {
+                var (rawDestinationRange, rawSourceRange, rawRangeLength) = input[line].Split(' ');
                 ranges.Add(new(
                     long.Parse(rawDestinationRange.Trim()),
                     long.Parse(rawSourceRange.Trim()),
@@ -98,14 +34,75 @@ file class Helper
                 line += 1;
             }
 
-            maps.Add(new(
-                from, to,
-                ranges.ToArray()
-            ));
-
+            maps.Add(ranges);
             line += 1;
         }
 
-        return (seedRanges, maps);
+        long ret = long.MaxValue;
+
+        for (int i = 0; i < seeds.Length; i += 2) {
+            ret = Math.Min(ret, Dfs(maps, 0, new(seeds[i], seeds[i] + seeds[i + 1] - 1)));
+        }
+
+        return ret.ToString();
+    }
+}
+
+public class IntervalMap(long destinationStart, long sourceStart, long length)
+{
+    public long DestinationStart { get; } = destinationStart;
+    public long SourceStart { get; } = sourceStart;
+    public long Length { get; } = length;
+}
+
+public class Interval(long lhs, long rhs)
+{
+    public long Lhs { get; } = lhs;
+    public long Rhs { get; } = rhs;
+}
+
+file class Helper
+{
+    public static long Dfs(List<List<IntervalMap>> maps, int idx, Interval currInterval) {
+        if (idx == maps.Count) {
+            return currInterval.Lhs;
+        }
+
+        long ret = long.MaxValue;
+        var intervals = new List<Interval> { currInterval };
+        foreach (var meta in maps[idx]) {
+            long shift = meta.DestinationStart - meta.SourceStart;
+            var nIntervals = new List<Interval>();
+            foreach (var i in intervals) {
+                var candInterval = new Interval(
+                    Math.Max(i.Lhs, meta.SourceStart),
+                    Math.Min(i.Rhs, meta.SourceStart + meta.Length - 1)
+                );
+
+                if (candInterval.Lhs > candInterval.Rhs) {
+                    nIntervals.Add(i);
+                    continue;
+                }
+
+                ret = Math.Min(ret,
+                    Dfs(maps, idx + 1, new Interval(shift + candInterval.Lhs, shift + candInterval.Rhs)));
+                if (candInterval.Lhs > i.Lhs) {
+                    nIntervals.Add(new Interval(i.Lhs, candInterval.Lhs - 1));
+                }
+
+                if (candInterval.Rhs < i.Rhs) {
+                    nIntervals.Add(new Interval(candInterval.Rhs + 1, i.Rhs));
+                }
+            }
+
+            intervals = nIntervals;
+        }
+
+
+        foreach (var interval in intervals) {
+            ret = Math.Min(ret, Dfs(maps, idx + 1, interval));
+        }
+
+        return ret;
     }
 }

@@ -5,8 +5,8 @@ class PartOne : ISolution
     public int Day => 6;
     public int Part => 1;
 
-    public async Task<string> RunAsync(FileInfo input) {
-        var (timeLine, distanceLine) = await File.ReadAllLinesAsync(input.FullName);
+    public async Task<string> RunAsync(FileInfo file) {
+        var (timeLine, distanceLine) = await File.ReadAllLinesAsync(file.FullName);
         var (_, rawTimes) = timeLine.Split(':');
         var (_, rawDistances) = distanceLine.Split(':');
 

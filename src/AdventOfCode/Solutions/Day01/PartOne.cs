@@ -7,11 +7,11 @@ public class PartOne : ISolution
     public int Day => 1;
     public int Part => 1;
 
-    public async Task<string> RunAsync(FileInfo input) {
+    public async Task<string> RunAsync(FileInfo file) {
         List<int> numbers = [];
 
         StringBuilder sb = new();
-        await foreach (var line in File.ReadLinesAsync(input.FullName)) {
+        await foreach (var line in File.ReadLinesAsync(file.FullName)) {
             sb.Clear();
 
             foreach (var c in line) {
