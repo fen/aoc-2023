@@ -1,4 +1,8 @@
-﻿namespace AdventOfCode.Solutions.Day10;
+using Point = (int X, int Y);
+
+namespace AdventOfCode.Solutions.Day10;
+
+using Map = Dictionary<Point, char>;
 
 public class PartTwo : ISolution
 {
@@ -6,157 +10,126 @@ public class PartTwo : ISolution
     public int Part => 2;
 
     public async Task<string> RunAsync(FileInfo file) {
-        var input = await File.ReadAllTextAsync(file.FullName);
-        var maze = ParseMaze(input);
-        var mazeSolver = new MazeSolver();
-        mazeSolver.FindLongestPath(maze);
-        mazeSolver.FindEnclosedSpaces();
-
-        for (int i = 0; i < maze.GetLength(0); i++) {
-            for (int j = 0; j < maze.GetLength(1); j++) {
-                Console.Write(maze[i, j]);
-            }
-
-            Console.WriteLine();
-        }
-
-        return "TODO";
+        var input = await File.ReadAllLinesAsync(file.FullName);
+        var map = ParseMap(input);
+        var loop = FindLoopPositionsInMap(map);
+        CleanupMap(map, loop);
+        return map.Keys.Count(position => IsEnclosed(map, position)).ToString();
     }
 
+    static readonly Point Up = (0, -1);
+    static readonly Point Down = (0, 1);
+    static readonly Point Left = (-1, 0);
+    static readonly Point Right = (1, 0);
+    static readonly Point[] Directions = [Up, Right, Down, Left];
 
-    public static char[,] ParseMaze(string stringMaze) {
-        string[] lines = stringMaze.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-        int rows = lines.Length;
-        int cols = lines[0].Length;
-
-        char[,] maze = new char[rows, cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                maze[i, j] = lines[i][j];
-            }
-        }
-
-        return maze;
-    }
-}
-
-public class MazeSolver
-{
-    public static int[,] directions = new int[4, 2] {
-        { -1, 0 }, // north
-        { 0, 1 }, // east
-        { 1, 0 }, // south
-        { 0, -1 }, // west
+    static readonly Dictionary<char, Point[]> DirectionMapping = new() {
+        { '7', [Left, Down] },
+        { 'F', [Right, Down] },
+        { 'L', [Up, Right] },
+        { 'J', [Up, Left] },
+        { '|', [Up, Down] },
+        { '-', [Left, Right] },
+        { 'S', [Up, Down, Left, Right] },
     };
 
-    public static Dictionary<char, bool[]> pipes = new Dictionary<char, bool[]>() {
-        { '.', new bool[] { false, false, false, false } },
-        { '|', new bool[] { true, false, true, false } },
-        { '-', new bool[] { false, true, false, true } },
-        { 'L', new bool[] { true, true, false, false } },
-        { 'J', new bool[] { true, false, false, true } },
-        { '7', new bool[] { false, false, true, true } },
-        { 'F', new bool[] { false, true, true, false } },
-        { 'S', new bool[] { true, true, true, true } },
-    };
+    Map ParseMap(string[] input) {
+        int rows = input.Length;
+        int columns = input[0].Length;
+        Map map = new();
+        for (int row = 0; row < rows; row++) {
+            for (int column = 0; column < columns; column++) {
+                map[(column, row)] = input[row][column];
+            }
+        }
 
-    private char[,] maze;
-    private int n, m;
-    public List<Tuple<int, int>> longestPath = new List<Tuple<int, int>>();
-
-    public List<Tuple<int, int>> FindLongestPath(char[,] maze) {
-        this.maze = maze;
-        this.n = maze.GetLength(0);
-        this.m = maze.GetLength(1);
-
-        bool[,] visited = new bool[n, m];
-
-        // Find the 'S' and start DFS
-        for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            if (maze[i, j] == 'S')
-                DFS(i, j, visited);
-
-
-        // for (int i = 0; i < n; i++)
-        // for (int j = 0; j < m; j++)
-        //     maze[i, j] = '.';
-
-        // mark the cells on longest path with '#'
-        // foreach (var cell in longestPath)
-        //     maze[cell.Item1, cell.Item2] = '#';
-
-        return longestPath;
+        return map;
     }
 
-    List<Tuple<int, int>> crossings = new List<Tuple<int, int>>();
+    HashSet<Point> FindLoopPositionsInMap(Map map) {
+        var startPosition = map.Keys.First(p => map[p] == 'S');
 
-    private void DFS(int startRow, int startCol, bool[,] visited) {
-        Stack<Tuple<int, int, List<Tuple<int, int>>>> stack = new Stack<Tuple<int, int, List<Tuple<int, int>>>>();
-        visited[startRow, startCol] = true;
-        stack.Push(Tuple.Create(startRow, startCol, new List<Tuple<int, int>> { Tuple.Create(startRow, startCol) }));
+        var startDirection = Directions
+            .First(dir => DirectionMapping[map[Add(startPosition, dir)]].Contains(Negate(dir)));
 
-        while (stack.Count > 0) {
-            var current = stack.Pop();
-            var row = current.Item1;
-            var col = current.Item2;
-            var curPath = current.Item3;
+        Point position = startPosition;
+        Point direction = startDirection;
+        HashSet<Point> positions = [];
+        // Keep finding loop points until the start point is reached again
+        for (;;) {
+            positions.Add(position);
+            position = Add(position, direction);
+            if (map[position] == 'S') {
+                break;
+            }
 
-            // Updating longest Path
-            if (curPath.Count > longestPath.Count)
-                longestPath = new List<Tuple<int, int>>(curPath);
+            direction = DirectionMapping[map[position]]
+                .Single(dirOut => dirOut != Negate(direction));
+        }
 
-            for (var i = 0; i < 4; i++) {
-                int newRow = row + directions[i, 0];
-                int newCol = col + directions[i, 1];
+        return positions;
+    }
 
-
-                if (maze[newRow, newCol] == '|'
-                    || (maze[newRow, newCol] == 'F' && maze[newRow, newCol + 1] == '-'
-                                                    && maze[newRow, newCol + 2] == 'J')
-                    || (maze[newRow, newCol] == 'L' && maze[newRow, newCol + 1] == '-'
-                                                    && maze[newRow, newCol + 2] == '7')) {
-                    crossings.Add(new Tuple<int, int>(newRow, newCol));
-                }
-
-                if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < m && !visited[newRow, newCol] &&
-                    pipes[maze[newRow, newCol]][(i + 2) % 4]) {
-                    visited[newRow, newCol] = true;
-                    List<Tuple<int, int>> newPath =
-                        new List<Tuple<int, int>>(curPath) { Tuple.Create(newRow, newCol) };
-                    stack.Push(Tuple.Create(newRow, newCol, newPath));
-                }
+    void CleanupMap(Map map, HashSet<Point> loop) {
+        foreach (Point point in map.Keys) {
+            if (!loop.Contains(point)) {
+                map[point] = GroundChar;
             }
         }
     }
 
+    const char GroundChar = '.';
 
-    public void FindEnclosedSpaces() {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (maze[i, j] == '.') {
-                    FloodFill(i, j);
-                }
+    /// <summary>
+    /// Point-in-polygon algorithm using even-odd rule analysis.
+    ///
+    /// 1-dimensional even-odd rule (or winding number algorithm) considers a point to be
+    /// interior if an infinitely long ray beginning at the point and extending in any
+    /// direction crosses an odd number of polygon edges. If it crosses an even number of edges,
+    /// it is considered to be situated outside of the polygon. This is premised on the concept
+    /// that each time you cross a boundary, you transition from inside to outside or vice versa.
+    ///
+    /// So, in the method <see cref="IsEnclosed"/>, the pipeline characters ('S', 'J', '|', or 'L')
+    /// are considered boundaries. While moving left across the line, we count the number of crossings
+    /// (flips of the inside variable). If we end with inside set to true, we must have crossed an odd
+    /// number of boundaries, so we were inside an enclosure.
+    ///
+    /// </summary>
+    bool IsEnclosed(Map map, Point position) {
+        if (map[position] != GroundChar) {
+            return false;
+        }
+
+        // You move leftwards through the map, every time you cross a pipe
+        // opening towards east or west ('S', 'J', 'L', '|'), you transition
+        // from 'inside to outside' or 'outside to inside'.
+        // The method considers 'S', 'J', 'L', and '|' as pipe sections which
+        // basically mark the boundaries of an enclosed ground.
+        var inside = false;
+        position = MoveLeft(position);
+        while (map.ContainsKey(position)) {
+            if ("SJL|".Contains(map[position])) {
+                inside = !inside;
             }
-        }
-    }
 
-    private void FloodFill(int row, int col) {
-        if (row < 0 || row >= n || col < 0 || col >= m || maze[row, col] != '.' || IsCrossing(row, col)) {
-            return;
+            position = MoveLeft(position);
         }
 
-        maze[row, col] = 'F';
-
-        FloodFill(row - 1, col); // north
-        FloodFill(row, col + 1); // east
-        FloodFill(row + 1, col); // south
-        FloodFill(row, col - 1); // west
+        // After this process, you are left with an inside flag.
+        // If it is true, then the original position was on enclosed ground
+        // (it was 'inside'). If false, it was not enclosed (it was 'outside').
+        return inside;
     }
 
-    private bool IsCrossing(int row, int col) {
-        // Check if the cell at (row, col) is in crossings list
-        return crossings.Any(c => c.Item1 == row && c.Item2 == col);
+    static Point MoveLeft(Point p) {
+        return (p.X-1, p.Y);
+    }
+
+    static Point Add(Point l, Point r) {
+        return (l.X + r.X, l.Y + r.Y);
+    }
+
+    static Point Negate(Point p) {
+        return (-p.X, -p.Y);
     }
 }
