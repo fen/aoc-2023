@@ -20,6 +20,26 @@ static partial class Helpers
 static partial class Helpers
 {
     /// <summary>
+    /// Counts the number of elements in the sequence that satisfy a condition, until the condition is false.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+    /// <param name="source">The sequence to count elements from.</param>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <returns>Returns the number of elements in the sequence until the condition becomes false.</returns>
+    public static int CountWhile<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate) {
+        int count = 0;
+        foreach (TSource element in source) {
+            if (!predicate(element)) {
+                return count;
+            }
+
+            count += 1;
+        }
+
+        return count;
+    }
+
+    /// <summary>
     /// Splits the given string by the specified separator character and trims each element.
     /// </summary>
     /// <param name="self">The input string to be split and trimmed.</param>
@@ -48,6 +68,7 @@ static partial class Helpers
         while (enumerator.MoveNext()) {
             last = enumerator.Current;
         }
+
         return (first, last);
     }
 
@@ -97,8 +118,7 @@ static partial class Helpers
     /// <typeparam name="T">The type of elements in the sequence.</typeparam>
     /// <param name="seq">The sequence of elements.</param>
     /// <returns>An enumerable of tuples representing adjacent pairs of elements.</returns>
-    public static IEnumerable<(T first, T second)> AdjacentPairs<T>(this IEnumerable<T> seq)
-    {
+    public static IEnumerable<(T first, T second)> AdjacentPairs<T>(this IEnumerable<T> seq) {
         using var enumerator = seq.GetEnumerator();
         enumerator.MoveNext();
         var first = enumerator.Current;
@@ -110,7 +130,6 @@ static partial class Helpers
             var second = enumerator.Current;
             yield return (first, second);
             first = second;
-
         } while (true);
     }
 }
@@ -133,11 +152,9 @@ static partial class Helpers
 
     static TResult Product<TSource, TResult>(this IEnumerable<TSource> source)
         where TSource : struct, INumber<TSource>
-        where TResult : struct, INumber<TResult>
-    {
+        where TResult : struct, INumber<TResult> {
         TResult sum = TResult.One;
-        foreach (TSource value in source)
-        {
+        foreach (TSource value in source) {
             checked { sum *= TResult.CreateChecked(value); }
         }
 
