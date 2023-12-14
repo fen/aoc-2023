@@ -24,8 +24,13 @@ using AdventOfCode.Solutions;
 // await SolveAsync<AdventOfCode.Solutions.Day10.PartTwo>(GetInputFile(10));
 // await SolveAsync<AdventOfCode.Solutions.Day11.PartOne>(GetInputFile(11));
 // await SolveAsync<AdventOfCode.Solutions.Day11.PartTwo>(GetInputFile(11));
-await SolveAsync<AdventOfCode.Solutions.Day12.PartOne>(GetInputFile(12));
-await SolveAsync<AdventOfCode.Solutions.Day12.PartTwo>(GetInputFile(12));
+// await SolveAsync<AdventOfCode.Solutions.Day12.PartOne>(GetInputFile(12));
+// await SolveAsync<AdventOfCode.Solutions.Day12.PartTwo>(GetInputFile(12));
+
+//await SolveAsync<AdventOfCode.Solutions.Day13.PartOne>(GetInputFile(13));
+
+await SolveAsync<AdventOfCode.Solutions.Day14.PartOne>(GetInputFile(14));
+await SolveAsync<AdventOfCode.Solutions.Day14.PartTwo>(GetInputFile(14));
 
 FileInfo GetInputFile(int day) => new($"Inputs/day_{day:D2}.input");
 

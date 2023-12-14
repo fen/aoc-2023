@@ -20,6 +20,59 @@ static partial class Helpers
 static partial class Helpers
 {
     /// <summary>
+    /// Searches for the first occurrence of an element in the sequence that satisfies a specified condition and returns its index.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+    /// <param name="source">The sequence to search in.</param>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="startIndex">The zero-based starting index for the search. Default is 0.</param>
+    /// <returns>The index of the first occurrence of an element that satisfies the condition; otherwise, -1.</returns>
+    public static int IndexOf<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate, int startIndex = 0) {
+        int index = 0;
+        foreach (TSource element in source) {
+            if (index <= startIndex) {
+                index += 1;
+                continue;
+            }
+
+            if (predicate(element)) {
+                return index;
+            }
+
+            index += 1;
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Searches for the specified element in a sequence and returns the zero-based index of the first occurrence, using the specified comparer to compare elements for equality.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+    /// <param name="source">The source sequence to search in.</param>
+    /// <param name="locate">The element to locate in the sequence.</param>
+    /// <param name="comparer">The equality comparer to use.</param>
+    /// <returns>
+    /// The zero-based index of the first occurrence of the element in the sequence, if found; otherwise, -1.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> or <paramref name="comparer"/> is null.</exception>
+    /// <remarks>
+    /// This method enumerates the source sequence until the specified element is found or the end of the sequence is reached.
+    /// </remarks>
+    public static int IndexOf<TSource>(this IEnumerable<TSource> source, TSource locate, IEqualityComparer<TSource> comparer) where TSource : notnull {
+        int index = 0;
+        foreach (TSource element in source) {
+            if (comparer.GetHashCode(locate) == comparer.GetHashCode(element) && comparer.Equals(locate, element)) {
+                return index;
+            }
+
+            index += 1;
+        }
+
+        return -1;
+    }
+
+    /// <summary>
     /// Counts the number of elements in the sequence that satisfy a condition, until the condition is false.
     /// </summary>
     /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
