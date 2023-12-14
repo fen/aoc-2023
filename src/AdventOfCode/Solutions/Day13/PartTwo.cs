@@ -1,9 +1,9 @@
 ﻿namespace AdventOfCode.Solutions.Day13;
 
-public class PartOne : ISolution
+public class PartTwo : ISolution
 {
     public int Day => 13;
-    public int Part => 1;
+    public int Part => 2;
 
     public async Task<string> RunAsync(FileInfo file) {
         string[] lines = await File.ReadAllLinesAsync(file.FullName);
@@ -28,21 +28,30 @@ public class PartOne : ISolution
 file class Grid(char[,] grid, int rows, int columns)
 {
     public int FindMirrorPoint() {
-        var point = FindMirrorPoint(isVertical: true);
-        if (point == -1) {
-            point = FindMirrorPoint(isVertical: false) * 100;
+        bool smudge = true;
+        var p1 = FindMirrorPoint(ref smudge, isVertical: true);
+        if (p1 == -1 || smudge) {
+            var p2 = FindMirrorPoint(ref smudge, isVertical: false) * 100;
+
+            if (p2 != -100) {
+                return p2;
+            }
         }
 
-        return point;
+        return p1;
     }
 
-    bool IsMirrorVertical(int middle) {
+    bool IsMirrorVertical(int middle, ref bool smudge) {
         for (int row = 0; row < rows; row++) {
             for (int i = 1; i <= Math.Min(middle, columns - middle); i++) {
                 var a = grid[row, middle - i];
                 var b = grid[row, middle + (i-1)];
                 if (a != b) {
-                    return false;
+                    if (smudge) {
+                        smudge = false;
+                    } else {
+                        return false;
+                    }
                 }
             }
         }
@@ -50,13 +59,17 @@ file class Grid(char[,] grid, int rows, int columns)
         return true;
     }
 
-    bool IsMirrorHorizontal(int middle) {
+    bool IsMirrorHorizontal(int middle, ref bool smudge) {
         for (int column = 0; column < columns; column++) {
             for (int row = 1; row <= Math.Min(middle, rows - middle); row++) {
                 var a = grid[middle - row, column];
                 var b = grid[middle + (row-1), column];
                 if (a != b) {
-                    return false;
+                    if (smudge) {
+                        smudge = false;
+                    } else {
+                        return false;
+                    }
                 }
             }
         }
@@ -64,19 +77,32 @@ file class Grid(char[,] grid, int rows, int columns)
         return true;
     }
 
-    int FindMirrorPoint(bool isVertical) {
+    delegate bool IsMirrorDelegate(int middle, ref bool smudge);
+
+    int FindMirrorPoint(ref bool smudge, bool isVertical = true) {
         int middle = isVertical ? columns / 2 : rows / 2;
-        Func<int, bool> IsMirror = isVertical ? IsMirrorVertical : IsMirrorHorizontal;
+        IsMirrorDelegate IsMirror = isVertical ? IsMirrorVertical : IsMirrorHorizontal;
         for (int i = middle; i >= 1; i--) {
-            if (IsMirror(i)) {
+            if (IsMirror(i, ref smudge)) {
+                if (smudge) {
+                    continue;
+                }
+
                 return i;
             }
+
+            smudge = true;
         }
 
         for (int i = middle + 1; i <= (isVertical ? columns : rows) - 1; i++) {
-            if (IsMirror(i)) {
+            if (IsMirror(i, ref smudge)) {
+                if (smudge) {
+                    continue;
+                }
                 return i;
             }
+
+            smudge = true;
         }
 
         return -1;
