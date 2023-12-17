@@ -19,6 +19,29 @@ static partial class Helpers
 
 static partial class Helpers
 {
+    public static IEqualityComparer<T> EqualityComparer<T>(Func<T, T, bool> equals, Func<T, int> getHashCode) {
+        return new InternalEqualityComparer<T>(equals, getHashCode);
+    }
+
+    private readonly struct InternalEqualityComparer<T>(Func<T, T, bool> equals, Func<T, int> getHashCode) : IEqualityComparer<T>
+    {
+        public bool Equals(T? x, T? y) {
+            if (x == null && y == null) {
+                return true;
+            }
+
+            if (x == null || y == null) {
+                return false;
+            }
+
+            return equals(x, y);
+        }
+
+        public int GetHashCode(T obj) {
+            return getHashCode(obj);
+        }
+    }
+
     /// <summary>
     /// Searches for the first occurrence of an element in the sequence that satisfies a specified condition and returns its index.
     /// </summary>
