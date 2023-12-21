@@ -41,7 +41,8 @@ using AdventOfCode.Solutions;
 
 // await SolveAsync<AdventOfCode.Solutions.Day19.PartOne>(GetInputFile(19));
 
-await SolveAsync<AdventOfCode.Solutions.Day20.PartOne>(GetInputFile(20));
+// await SolveAsync<AdventOfCode.Solutions.Day20.PartOne>(GetInputFile(20));
+await SolveAsync<AdventOfCode.Solutions.Day21.PartOne>(GetInputFile(21));
 
 FileInfo GetInputFile(int day) => new($"Inputs/day_{day:D2}.input");
 
