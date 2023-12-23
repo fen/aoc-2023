@@ -19,6 +19,26 @@ static partial class Helpers
 
 static partial class Helpers
 {
+    public static IEnumerable<(T, T)> Range<T>(this (T, T) from, (T, T) to) where T : INumber<T> {
+        var (fromRow, fromColumn) = from;
+        var (toRow, toColumn) = to;
+        for (var row = fromRow; row < toRow; row += T.One) {
+            for (var column = fromColumn; column < toColumn; column += T.One) {
+                yield return (column, row);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="IEqualityComparer{T}"/> interface
+    /// using the specified functions for determining equality and calculating hash codes. </summary>
+    /// <typeparam name="T">The type of objects to compare.</typeparam>
+    /// <param name="equals">A function that compares two objects for equality.</param>
+    /// <param name="getHashCode">A function that calculates the hash code for an object.</param>
+    /// <returns>
+    /// A new instance of the <see cref="IEqualityComparer{T}"/> interface that uses the specified
+    /// functions for equality comparison and hash code calculation.
+    /// </returns>
     public static IEqualityComparer<T> EqualityComparer<T>(Func<T, T, bool> equals, Func<T, int> getHashCode) {
         return new InternalEqualityComparer<T>(equals, getHashCode);
     }
