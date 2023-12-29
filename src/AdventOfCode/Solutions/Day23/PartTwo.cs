@@ -15,7 +15,7 @@ public class PartTwo : ISolution
 
     public async Task<string> RunAsync(FileInfo file) {
         var lines = await File.ReadAllLinesAsync(file.FullName);
-        Map map = (row: 0, column: 0).Range((row: lines.Length, column: lines[0].Length))
+        Map map = (0, 0).Range((lines.Length, lines[0].Length))
             .ToImmutableDictionary(p => (Position)p, p => {
                 char c = lines[p.Item2][p.Item1];
                 return c switch {

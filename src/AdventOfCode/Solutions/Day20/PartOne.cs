@@ -73,7 +73,7 @@ file sealed class FlipFlopModule(string name, string[] outputs) : Module(name)
     public override IEnumerable<Signal> Execute(Signal signal) {
         if (!signal.Value) {
             _state = !_state;
-            return outputs.Select(to => new Signal(name, to, _state));
+            return outputs.Select(to => new Signal(Name, to, _state));
         } else {
             return [];
         }
@@ -87,13 +87,13 @@ file sealed class ConjuctionModule(string name, string[] inputs, string[] output
     public override IEnumerable<Signal> Execute(Signal signal) {
         _state[signal.From] = signal.Value;
         var outputValue = !_state.Values.All(v => v);
-        return outputs.Select(to => new Signal(name, to, outputValue));
+        return outputs.Select(to => new Signal(Name, to, outputValue));
     }
 }
 
 file sealed class BroadcastModule(string name, string[] outputs) : Module(name)
 {
     public override IEnumerable<Signal> Execute(Signal signal) {
-        return outputs.Select(to => new Signal(name, to, signal.Value));
+        return outputs.Select(to => new Signal(Name, to, signal.Value));
     }
 }

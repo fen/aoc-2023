@@ -136,7 +136,7 @@ file abstract class Rule
                 throw new UnreachableException();
             }
         } else if (rawRule.IndexOf(':') != -1) {
-            return ConditionalRule.Parse(rawRule);
+            return ConditionalRule.ParseConditionalRule(rawRule);
         } else {
             return new DestinationRule(rawRule);
         }
@@ -179,20 +179,20 @@ file class ConditionalRule(Variable variable, Operator @operator, int value, Rul
     public int Value { get; } = value;
     public Rule Rule { get; } = rule;
 
-    public static ConditionalRule Parse(string rawRule) {
+    public static ConditionalRule ParseConditionalRule(string rawRule) {
         var (rawCondition, rawDestination) = rawRule.Split(':');
         var (variable, op, value) = ParseCondition(rawCondition);
         return new ConditionalRule(
             variable, op, value,
-            Day19.Rule.Parse(rawDestination)
+            Parse(rawDestination)
         );
     }
 
     public override bool TryExecute(in Rating rating, out bool accepted) {
         var left = rating.GetValue(Variable);
-        if (this.Operator == Operator.GreaterThan && left > Value) {
+        if (Operator == Operator.GreaterThan && left > Value) {
             return Rule.TryExecute(in rating, out accepted);
-        } else if (this.Operator == Operator.LessThan && left < Value) {
+        } else if (Operator == Operator.LessThan && left < Value) {
             return Rule.TryExecute(in rating, out accepted);
         } else {
             accepted = false;
@@ -238,14 +238,16 @@ file static class Helper
             'x' => Variable.X,
             'm' => Variable.M,
             'a' => Variable.A,
-            's' => Variable.S
+            's' => Variable.S,
+            _ => throw new UnreachableException()
         };
     }
 
     public static Operator ToOperator(this char self) {
         return self switch {
             '<' => Operator.LessThan,
-            '>' => Operator.GreaterThan
+            '>' => Operator.GreaterThan,
+            _ => throw new UnreachableException()
         };
     }
 }

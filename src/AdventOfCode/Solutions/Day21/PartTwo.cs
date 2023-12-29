@@ -30,7 +30,7 @@ public class PartTwo : ISolution
         ];
 
         var n = 26501365;
-        long r = (long)(y[0] + diffY[0] * (n - x[0]) + diffY[3] * (n - x[0]) * (n - x[1]));
+        long r = (long)(y[0] + diffY[0] * (n - x[0]) + diffY[2] * (n - x[0]) * (n - x[1]));
 
         return r.ToString();
     }
